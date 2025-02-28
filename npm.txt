@@ -1,0 +1,6 @@
+express
+axios
+node-cron
+pg
+dotenv
+cors
