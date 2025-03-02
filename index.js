@@ -17,6 +17,9 @@ dailyTask();
 const deviceRouter = require("./src/router/device");
 app.use("/device", deviceRouter);
 
+const pointRouter = require("./src/router/point");
+app.use("/v1.0", pointRouter);
+
 const notFoundMiddleware = require("./src/middleware/notFoundMiddleware");
 app.use(notFoundMiddleware);
 

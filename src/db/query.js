@@ -20,9 +20,17 @@ const d004 =
 // device 적립 개수 변경 시 변경 정보 받아오는 query
 const d005 =
   "SELECT dev_id, dev_type, curr_count FROM device_item_count ORDER BY id DESC LIMIT 1";
+// ci값으로 해당 유저 조회
+const getUserPhone = "SELECT phone FROM user_ci WHERE ci=$1";
+// phone번호로 유저 idx 조회
+const getUserId =
+  "SELECT user_id FROM login_account WHERE phone=(SELECT phone FROM user_ci WHERE ci=$1)";
 
 const m001 =
   "SELECT * FROM wallet_point_history WHERE owner_id=$1 ORDER BY id DESC LIMIT 1";
+
+const m002 =
+  "INSERT INTO wallet_point_history(description,point,acc_point,inout_type,trans_state,memo,owner_id,trader_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8)";
 
 module.exports = {
   d001Pet,
@@ -33,5 +41,8 @@ module.exports = {
   d003Cup,
   d004,
   d005,
+  getUserPhone,
+  getUserId,
   m001,
+  m002,
 };

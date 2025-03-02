@@ -1,7 +1,6 @@
 const router = require("express").Router();
 const trycatchWrapper = require("./../module/trycatchWrapper");
 const customError = require("./../module/customError");
-const crypto = require("crypto");
 
 const { echoHubPath } = require("./../constant/url");
 const echohubToken = process.env.ECHOHUBTOKEN;
@@ -16,34 +15,10 @@ const {
   d005,
 } = require("./../db/query");
 
-const regex = require("./../constant/regx");
-const { nonNegativeNumberRegex } = regex;
+const { nonNegativeNumberRegex } = require("./../constant/regx");
 
 const { apiService } = require("./../service/apiService");
-
-// AES-256-CBC 암호화 함수
-function encryptCI(ciValue, key, iv) {
-  const cipher = crypto.createCipheriv(
-    "aes-256-cbc",
-    Buffer.from(key, "hex"),
-    Buffer.from(iv, "hex")
-  );
-  let encrypted = cipher.update(ciValue, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return encrypted;
-}
-
-// AES-256-CBC 복호화 함수
-function decryptCI(encryptedCI, key, iv) {
-  const decipher = crypto.createDecipheriv(
-    "aes-256-cbc",
-    Buffer.from(key, "hex"),
-    Buffer.from(iv, "hex")
-  );
-  let decrypted = decipher.update(encryptedCI, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
-}
+const { encryptCI, decryptCI } = require("./../util/crypto");
 
 //D-001
 router.post(
@@ -141,16 +116,19 @@ router.post(
     ci = userInfo.rows[0].ci;
 
     // AES-256-CBC 방식으로 CI 값을 암호화하고, Hex string으로 변환
-    const key =
-      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"; // 64자리 Hex (32바이트)
-    const iv = "abcdef9876543210abcdef9876543210"; // 32자리 Hex (16바이트)
-
     // 암호화 실행
-    const encryptedCI = encryptCI(ci, key, iv);
+    const encryptedCI = encryptCI(
+      ci,
+      process.env.AES256CBCKEY,
+      process.env.AES256CBCIV
+    );
     console.log("Encrypted CI (Hex):", encryptedCI);
-
     // 복호화 실행
-    const decryptedCI = decryptCI(encryptedCI, key, iv);
+    const decryptedCI = decryptCI(
+      encryptedCI,
+      process.env.AES256CBCKEY,
+      process.env.AES256CBCIV
+    );
     console.log("Decrypted CI:", decryptedCI);
 
     const postData = {
