@@ -30,7 +30,7 @@ const m001 =
   "SELECT * FROM wallet_point_history WHERE owner_id=$1 ORDER BY id DESC LIMIT 1";
 
 const m002 =
-  "INSERT INTO wallet_point_history(description,point,acc_point,inout_type,trans_state,memo,owner_id,trader_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8)";
+  "INSERT INTO wallet_point_history(description,point,acc_point,inout_type,memo,owner_id,trader_id) VALUES($1,$2,$3,$4,$5,$6,$7)";
 
 module.exports = {
   d001Pet,
