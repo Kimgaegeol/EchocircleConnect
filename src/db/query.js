@@ -10,7 +10,8 @@ const d002 =
   "SELECT curr_count, dev_type FROM device_item_count WHERE dev_id=$1";
 // Pet,Cup 두 테이블에서 사용자의 기기 사용 정보 받아오는 query
 const d003Pet =
-  "SELECT machine_id, user_id, point, created_at, weight FROM pet_point_history ORDER BY id DESC LIMIT 1";
+  "SELECT machine_id, phone, point, created_at, weight FROM pet_point_history ORDER BY id DESC LIMIT 1";
+const d003GetCi = "SELECT * FROM user_ci WHERE phone=$1";
 const d003Cup =
   "SELECT machine_id, user_id, cup_count, created_at, weight FROM cup_point_history ORDER BY id DESC LIMIT 1";
 // device 상태 변경 시 변경 정보 받아오는 query
@@ -23,4 +24,14 @@ const d005 =
 const m001 =
   "SELECT * FROM wallet_point_history WHERE owner_id=$1 ORDER BY id DESC LIMIT 1";
 
-module.exports = { d001Pet, d001Cup, d002, d003Pet, d003Cup, d004, d005, m001 };
+module.exports = {
+  d001Pet,
+  d001Cup,
+  d002,
+  d003Pet,
+  d003GetCi,
+  d003Cup,
+  d004,
+  d005,
+  m001,
+};

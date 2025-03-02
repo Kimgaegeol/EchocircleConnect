@@ -1,18 +1,49 @@
 const router = require("express").Router();
 const trycatchWrapper = require("./../module/trycatchWrapper");
 const customError = require("./../module/customError");
+const crypto = require("crypto");
 
 const { echoHubPath } = require("./../constant/url");
-
 const echohubToken = process.env.ECHOHUBTOKEN;
 
 const client = require("./../db/db");
-const { d001Pet, d002, d003Pet, d004, d005 } = require("./../db/query");
+const {
+  d001Pet,
+  d002,
+  d003Pet,
+  d003GetCi,
+  d004,
+  d005,
+} = require("./../db/query");
 
 const regex = require("./../constant/regx");
 const { nonNegativeNumberRegex } = regex;
 
 const { apiService } = require("./../service/apiService");
+
+// AES-256-CBC 암호화 함수
+function encryptCI(ciValue, key, iv) {
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    Buffer.from(key, "hex"),
+    Buffer.from(iv, "hex")
+  );
+  let encrypted = cipher.update(ciValue, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return encrypted;
+}
+
+// AES-256-CBC 복호화 함수
+function decryptCI(encryptedCI, key, iv) {
+  const decipher = crypto.createDecipheriv(
+    "aes-256-cbc",
+    Buffer.from(key, "hex"),
+    Buffer.from(iv, "hex")
+  );
+  let decrypted = decipher.update(encryptedCI, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+}
 
 //D-001
 router.post(
@@ -93,20 +124,45 @@ router.post(
     const wasteType = "PET";
     const wasteAmount = result.rows[0].point;
     const deviceId = result.rows[0].machine_id;
-    const memberUid = result.rows[0].user_id;
+    const phone = result.rows[0].phone;
     const useAt = new Date(result.rows[0].created_at).getTime();
     const totalWasteAmount = result.rows[0].point;
     const reservePoint = result.rows[0].point;
-    // const reservePoint = result.rows[0].weight;
+
+    let userInfo = await client.query(d003GetCi, [phone]);
+
+    if (userInfo.rows.length == 0) {
+      res.status(200).send({
+        message: "ci값이 등록되지 않은 유저입니다.",
+      });
+      return;
+    }
+
+    ci = userInfo.rows[0].ci;
+
+    // AES-256-CBC 방식으로 CI 값을 암호화하고, Hex string으로 변환
+    const key =
+      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"; // 64자리 Hex (32바이트)
+    const iv = "abcdef9876543210abcdef9876543210"; // 32자리 Hex (16바이트)
+
+    // 암호화 실행
+    const encryptedCI = encryptCI(ci, key, iv);
+    console.log("Encrypted CI (Hex):", encryptedCI);
+
+    // 복호화 실행
+    const decryptedCI = decryptCI(encryptedCI, key, iv);
+    console.log("Decrypted CI:", decryptedCI);
 
     const postData = {
       detail: [{ waste_type: wasteType, waste_amount: wasteAmount }],
       device_id: deviceId,
-      member_uid: memberUid,
+      member_uid: encryptedCI,
       use_at: useAt,
       total_waste_amount: totalWasteAmount,
       reserve_point: reservePoint,
     };
+
+    console.log(postData);
 
     const data = await apiService(echoHubPath.d003, echohubToken, postData);
 
