@@ -24,6 +24,7 @@ const { encryptCI, decryptCI } = require("./../util/crypto");
 router.post(
   "/d001",
   trycatchWrapper(async (req, res, next) => {
+    console.log("실행됨");
     const resultPet = await client.query(d001Pet);
 
     const totalCount = resultPet.rowCount; // D-001의 total_count
@@ -54,6 +55,7 @@ router.post(
 
     const data = await apiService(echoHubPath.d001, echohubToken, postData);
 
+    console.log(data);
     res.status(200).send({
       data: data,
     });
@@ -83,6 +85,8 @@ router.post(
     };
 
     const data = await apiService(echoHubPath.d002, echohubToken, postData);
+
+    console.log(data);
 
     res.status(200).send({
       data: data,
@@ -144,6 +148,8 @@ router.post(
 
     const data = await apiService(echoHubPath.d003, echohubToken, postData);
 
+    console.log(data);
+
     res.status(200).send({
       data: data,
     });
@@ -168,6 +174,8 @@ router.post(
     };
 
     const data = await apiService(echoHubPath.d004, echohubToken, postData);
+
+    console.log(data);
 
     res.status(200).send({
       data: data,
@@ -195,6 +203,8 @@ router.post(
     };
 
     const data = await apiService(echoHubPath.d005, echohubToken, postData);
+
+    console.log(data);
 
     res.status(200).send({
       data: data,

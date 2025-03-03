@@ -21,20 +21,22 @@ router.get(
     );
     console.log("Decrypted CI:", decryptedCI);
 
-    const userId = await client.query(getUserId, [decryptCI]);
+    const checkUser = await client.query(getUserId, [decryptedCI]);
 
-    if (userId.rows.length == 0)
+    if (checkUser.rows.length == 0)
       throw customError("해당 ci로 등록된 회원이 존재하지 않습니다.", 404);
+
+    const userId = checkUser.rows[0].user_id;
 
     const userData = await client.query(m001, [userId]);
 
-    if (result.rows.length == 0) {
+    if (userData.rows.length == 0) {
       res.status(200).send({
-        result_code: "0000",
-        result_message: "개인 포인트 정보 조회 성공",
+        resultCode: "0000",
+        resultMessage: "개인 포인트 정보 조회 성공",
         data: {
-          member_uid: userId,
-          point_balance: 0,
+          memberUid: userId,
+          pointBalance: 0,
         },
       });
     }
@@ -42,11 +44,11 @@ router.get(
     const accPoint = userData.rows[0].acc_point;
 
     res.status(200).send({
-      result_code: "0000",
-      result_message: "개인 포인트 정보 조회 성공",
+      resultCode: "0000",
+      resultMessage: "개인 포인트 정보 조회 성공",
       data: {
-        member_uid: userId,
-        point_balance: accPoint,
+        memberUid: userId,
+        pointBalance: accPoint,
       },
     });
   })
@@ -72,10 +74,12 @@ router.post(
     );
     console.log("Decrypted CI:", decryptedCI);
 
-    const userId = await client.query(getUserId, [decryptCI]);
+    const checkUser = await client.query(getUserId, [decryptedCI]);
 
-    if (userId.rows.length == 0)
+    if (checkUser.rows.length == 0)
       throw customError("해당 ci로 등록된 회원이 존재하지 않습니다.", 404);
+
+    const userId = checkUser.rows[0].user_id;
 
     const userData = await client.query(m001, [userId]);
 
@@ -86,6 +90,7 @@ router.post(
       );
 
     const accPoint = userData.rows[0].acc_point;
+    console.log(accPoint);
 
     if (request_point > accPoint)
       throw customError(
@@ -112,8 +117,8 @@ router.post(
     ]);
 
     res.status(201).send({
-      result_code: "0000",
-      result_message: "포인트 환전 신청 성공",
+      resultCode: "0000",
+      resultMessage: "포인트 환전 신청 성공",
     });
   })
 );
