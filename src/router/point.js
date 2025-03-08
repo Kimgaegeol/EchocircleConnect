@@ -19,7 +19,6 @@ router.get(
       process.env.AES256CBCKEY,
       process.env.AES256CBCIV
     );
-    console.log("Decrypted CI:", decryptedCI);
 
     const checkUser = await client.query(getUserId, [decryptedCI]);
 
@@ -72,7 +71,6 @@ router.post(
       process.env.AES256CBCKEY,
       process.env.AES256CBCIV
     );
-    console.log("Decrypted CI:", decryptedCI);
 
     const checkUser = await client.query(getUserId, [decryptedCI]);
 
@@ -90,7 +88,6 @@ router.post(
       );
 
     const accPoint = userData.rows[0].acc_point;
-    console.log(accPoint);
 
     if (request_point > accPoint)
       throw customError(

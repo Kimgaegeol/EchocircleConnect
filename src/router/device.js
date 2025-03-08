@@ -24,7 +24,6 @@ const { encryptCI, decryptCI } = require("./../util/crypto");
 router.post(
   "/d001",
   trycatchWrapper(async (req, res, next) => {
-    console.log("실행됨");
     const resultPet = await client.query(d001Pet);
 
     const totalCount = resultPet.rowCount; // D-001의 total_count
@@ -55,7 +54,6 @@ router.post(
 
     const data = await apiService(echoHubPath.d001, echohubToken, postData);
 
-    console.log(data);
     res.status(200).send({
       data: data,
     });
@@ -86,8 +84,6 @@ router.post(
 
     const data = await apiService(echoHubPath.d002, echohubToken, postData);
 
-    console.log(data);
-
     res.status(200).send({
       data: data,
     });
@@ -108,7 +104,7 @@ router.post(
     const totalWasteAmount = result.rows[0].point;
     const reservePoint = result.rows[0].point;
 
-    let userInfo = await client.query(d003GetCi, [phone]);
+    let userInfo = await client.query(d003GetCi, ["01055921087"]);
 
     if (userInfo.rows.length == 0) {
       res.status(200).send({
@@ -126,14 +122,12 @@ router.post(
       process.env.AES256CBCKEY,
       process.env.AES256CBCIV
     );
-    console.log("Encrypted CI (Hex):", encryptedCI);
     // 복호화 실행
     const decryptedCI = decryptCI(
       encryptedCI,
       process.env.AES256CBCKEY,
       process.env.AES256CBCIV
     );
-    console.log("Decrypted CI:", decryptedCI);
 
     const postData = {
       detail: [{ waste_type: wasteType, waste_amount: wasteAmount }],
@@ -144,11 +138,7 @@ router.post(
       reserve_point: reservePoint,
     };
 
-    console.log(postData);
-
     const data = await apiService(echoHubPath.d003, echohubToken, postData);
-
-    console.log(data);
 
     res.status(200).send({
       data: data,
@@ -174,8 +164,6 @@ router.post(
     };
 
     const data = await apiService(echoHubPath.d004, echohubToken, postData);
-
-    console.log(data);
 
     res.status(200).send({
       data: data,
@@ -203,8 +191,6 @@ router.post(
     };
 
     const data = await apiService(echoHubPath.d005, echohubToken, postData);
-
-    console.log(data);
 
     res.status(200).send({
       data: data,

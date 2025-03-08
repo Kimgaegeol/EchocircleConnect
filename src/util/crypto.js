@@ -4,11 +4,12 @@ const crypto = require("crypto");
 const encryptCI = (ciValue, key, iv) => {
   const cipher = crypto.createCipheriv(
     "aes-256-cbc",
-    Buffer.from(key, "hex"),
-    Buffer.from(iv, "hex")
+    Buffer.from(key), // 키 변환
+    Buffer.from(iv) // IV 변환
   );
   let encrypted = cipher.update(ciValue, "utf8", "hex");
   encrypted += cipher.final("hex");
+
   return encrypted;
 };
 
@@ -16,8 +17,8 @@ const encryptCI = (ciValue, key, iv) => {
 const decryptCI = (encryptedCI, key, iv) => {
   const decipher = crypto.createDecipheriv(
     "aes-256-cbc",
-    Buffer.from(key, "hex"),
-    Buffer.from(iv, "hex")
+    Buffer.from(key), // 키 변환
+    Buffer.from(iv) // IV 변환
   );
   let decrypted = decipher.update(encryptedCI, "hex", "utf8");
   decrypted += decipher.final("utf8");
